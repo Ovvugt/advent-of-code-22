@@ -4,7 +4,7 @@ internal class Program
 {
     public static void Main()
     {
-        var filesString = File.ReadAllText("files.txt");
+        var filesString = System.IO.File.ReadAllText("files.txt");
 
         var fileSystem = FileSystem.GetInstance();
         
@@ -40,14 +40,14 @@ internal class FileSystem
     public int UsedSpace { get; private set; }
     public int AvailableSpace => Capacity - UsedSpace;
 
-    public int Sum = 0;
+    public int Sum { get; set; }
     public int SmallestDirectoryToRemove = int.MaxValue;
 
     private static FileSystem? _instance;
 
     private FileSystem(int capacity)
     {
-        _rootDirectory = new Folder("/", null, this);
+        _rootDirectory = new Folder("/", null);
         CurrentDirectory = _rootDirectory;
         Capacity = capacity;
     }
@@ -64,12 +64,12 @@ internal class FileSystem
 
     public void CreateDirectory(string folderName)
     {
-        CurrentDirectory.Files.Add(new Folder(folderName, CurrentDirectory, this));
+        CurrentDirectory.Files.Add(new Folder(folderName, CurrentDirectory));
     }
 
     public void CreateFile(int size, string fileName)
     {
-        CurrentDirectory.Files.Add(new File_(fileName, size));
+        CurrentDirectory.Files.Add(new File(fileName, size));
     }
 
     private void ChangeDirectory(string folderName)
@@ -86,7 +86,7 @@ internal class FileSystem
             return;
         }
         
-        CurrentDirectory = CurrentDirectory.Files.First(file => file.Name == folderName && file is Folder) as Folder;
+        CurrentDirectory = (CurrentDirectory.Files.First(file => file.Name == folderName && file is Folder) as Folder)!;
     }
     
     public void HandleCommand(string line)
@@ -104,14 +104,14 @@ internal class FileSystem
     }
 }
 
-internal class Folder : File_
+internal class Folder : File
 {
-    public List<File_> Files { get; }
+    public List<File> Files { get; }
     public Folder? Parent { get; }
-    internal Folder(string name, Folder? parent, FileSystem fileSystem) : base(name, 0)
+    internal Folder(string name, Folder? parent) : base(name, 0)
     {
         Parent = parent;
-        Files = new List<File_>();
+        Files = new List<File>();
     }
 
     public override int GetSize()
@@ -142,7 +142,7 @@ internal class Folder : File_
     }
 }
 
-internal class File_
+internal class File
 {
     public string Name { get; set; }
     private readonly int _size;
@@ -150,7 +150,7 @@ internal class File_
     public virtual int GetSize()
         => _size;
 
-    internal File_(string name, int size)
+    internal File(string name, int size)
     {
         _size = size;
         Name = name;
