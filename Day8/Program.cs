@@ -19,6 +19,8 @@ CheckTrees(0, n, (x,y) => x < y, x => ++x, 0, n, (x, y) => x < y, x => ++x, tree
 CheckTrees(0, n, (x,y) => x < y, x => ++x, n - 1, 0, (x, y) => x >= y, x => --x, trees, false);
 
 var visibleTrees = 0;
+var maxScenicScore = 0;
+
 for (var i = 0; i < n; i++)
 {
     for (var j = 0; j < n; j++)
@@ -120,17 +122,6 @@ for (var i = 0; i < n; i++)
             }
         }
         tree.ScenicScore *= countLeft * countRight * countUp * countDown;
-    }
-}
-
-Console.WriteLine(visibleTrees);
-
-var maxScenicScore = 0;
-for (var i = 0; i < n; i++)
-{
-    for (var j = 0; j < n; j++)
-    {
-        var tree = trees[i, j];
         if (tree.ScenicScore > maxScenicScore)
         {
             maxScenicScore = tree.ScenicScore;
@@ -138,6 +129,7 @@ for (var i = 0; i < n; i++)
     }
 }
 
+Console.WriteLine(visibleTrees);
 Console.WriteLine(maxScenicScore);
 
 void CheckTrees(int startpointX, int endpointX, Func<int, int, bool> checkX, Func<int, int> transformationX,
